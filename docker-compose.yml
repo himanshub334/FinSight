@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: finsight
+      POSTGRES_USER: finsight
+      POSTGRES_PASSWORD: finsight
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql://finsight:finsight@postgres:5432/finsight
+    depends_on: [postgres]
+    ports: ["8000:8000"]
+
+  frontend:
+    build: ./frontend
+    depends_on: [api]
+    ports: ["5173:5173"]
+
+volumes:
+  pgdata:
